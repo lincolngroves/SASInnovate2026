@@ -1,0 +1,4 @@
+proc casutil;
+        promote casdata='_prepped' incaslib='casuser' casout='_prepped'
+        outcaslib='casuser';
+run;
