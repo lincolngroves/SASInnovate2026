@@ -1,0 +1,88 @@
+Helpful HOW Prompts | iLink Mortgage, Inc
+
+
+***************************************  Task 1: Upload Data to CAS ;
+
+proc casutil;
+        promote casdata='_prepped' incaslib='casuser' casout='_prepped'
+        outcaslib='casuser';
+run;
+
+
+***************************************  Task 2a: Refining Your Modeling with SAS Viya Copilot ;
+
+Prompts:
+
+Using the _PREPPED CAS table, generate SAS code to fit a generalized additive model predicting BAD using interval inputs [ LOAN VALUE IM_CLAGE IM_DEBTINC IM_MORTDUE ], nominal inputs [ REASON JOB DEROG DELINQ NINQ IM_CLNO IM_YOJ ], and BAD as a binary target.
+
+
+I don’t see a model assessment step to compare the Forest, Gradient Boosting, and GAM models. How would I directly compare those three models in a SAS Studio flow, using the average squared error of the validation sample as the selection statistic?
+
+
+***************************************  Task 3a: Using SAS Viya Copilot to Improve your Visual Analytics Project
+
+Prompts:
+
+Do you see any current weaknesses in my analysis?
+
+Can you summarize my report in a couple of paragraphs?
+
+Can you describe the outcomes of the modeling, including which model is best and which factors were most influential?
+
+Are there additional models I should explore in my predictive modeling?
+
+When does it make sense to run a gradient boosting model?
+
+
+***************************************  Task 4: Python Code for SAS Model Studio ;
+
+from sklearn import ensemble
+
+# Get full data with inputs + partition indicator
+dm_input.insert(0, dm_partitionvar)
+fullX = dm_inputdf.loc[:, dm_input]
+
+# Dummy encode class variables
+fullX_enc = pd.get_dummies(fullX, columns=dm_class_input, drop_first=True)
+
+# Create X (features/inputs); drop partition indicator
+X_enc = fullX_enc[fullX_enc[dm_partitionvar] == dm_partition_train_val]
+X_enc = X_enc.drop(dm_partitionvar, axis=1)
+
+# Create y (labels)
+y = dm_traindf[dm_dec_target]
+
+# Fit RandomForest model w/ training data
+params = {'n_estimators': 100, 'max_depth': 20, 'min_samples_leaf': 5}
+dm_model = ensemble.RandomForestClassifier(**params)
+dm_model.fit(X_enc, y)
+print(dm_model)
+
+# Save VariableImportance to CSV
+varimp = pd.DataFrame(list(zip(X_enc, dm_model.feature_importances_)), columns=['Variable Name', 'Importance'])
+varimp.to_csv(dm_nodedir + '/rpt_var_imp.csv', index=False)
+
+# Score full data
+fullX_enc = fullX_enc.drop(dm_partitionvar, axis=1)
+dm_scoreddf = pd.DataFrame(dm_model.predict_proba(fullX_enc), columns=['P_BAD0', 'P_BAD1'])
+
+
+
+***************************************  Task 4a: Using Copilot to Improve and Interpret your SAS Model Studio Project ;
+
+Do you see any potential weaknesses in my current modeling pipeline?
+
+How could I improve the performance of my current champion model?
+
+What trade-offs should I consider when choosing this model in a mortgage lending scenario?
+
+What should I consider when deploying and monitoring this model?
+
+
+
+***************************************  Task 5: Revisit Copilot ;
+
+What fairness considerations should I evaluate for a mortgage default prediction model?
+
+
+
